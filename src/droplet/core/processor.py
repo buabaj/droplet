@@ -19,22 +19,23 @@ class Processor:
 
         placeholders = self._extract_placeholders(content)
         generated_code = {}
-        tests = {}
+        generated_tests = {}
         dependencies = set()
 
         for placeholder, description in placeholders.items():
             code = self.code_generator.generate(description)
             generated_code[placeholder] = code
-            tests[placeholder] = self.test_generator.generate(code, description)
+            generated_tests[placeholder] = self.test_generator.generate(code, description)
             dependencies.update(self.dependency_analyzer.analyze(code))
 
         new_content = self.code_replacer.replace(content, generated_code)
+        test_file_content = self.test_generator.format_test_file(generated_tests)
 
         return {
             'original_content': content,
             'new_content': new_content,
             'generated_code': generated_code,
-            'tests': tests,
+            'test_file_content': test_file_content,
             'dependencies': list(dependencies)
         }
 
